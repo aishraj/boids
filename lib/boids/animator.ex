@@ -21,12 +21,11 @@ defmodule Boids.Animator do
   def create_birds(n) do
     (0..n-1)
     |> Enum.shuffle
-    |> Enum.with_index
-    |> Enum.each(fn {pos,id} -> new_bird(id,pos) end)
+    |> Enum.each(&new_bird(&1))
   end
 
-  defp new_bird(bird_id, pos_x) do
-    spec = %{id: Boid, start: {Boids.Boid, :start_link, [{bird_id, pos_x}]}}
+  defp new_bird(pos_x) do
+    spec = %{id: Boid, start: {Boids.Boid, :start_link, [pos_x]}}
     DynamicSupervisor.start_child(Boids.DynamicSupervisor, spec)
   end
 end

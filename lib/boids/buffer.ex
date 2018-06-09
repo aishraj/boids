@@ -1,19 +1,22 @@
 defmodule Boids.Buffer do
-  use GenServer
+  use Agent
   require Logger
 
   #API
-  def start_link(arg) do
-    GenServer.start_link(__MODULE__, arg)
+  def start_link(_arg) do
+    Agent.start_link(fn -> Map.new end, name: __MODULE__)
   end
 
-  @impl true
-  def init(state) do
-    {:ok, state}
+  def add_position(pid, position) do
+    Agent.update(__MODULE__, &Map.put(&1, pid, position))
   end
 
-  @impl true
-  def handle_call(:do_something_else, _from, state) do
-    {:reply, state}
+  def get_position(pid) do
+    Agent.get(__MODULE__, &Map.get(&1, pid, ""))
   end
+
+  def get_all_positions do
+    Agent.get(__MODULE__, &Map.to_list(&1) |> Map.new)
+  end
+
 end

@@ -4,7 +4,7 @@ defmodule Boids.Animator do
 
   #API
   def start_link(arg) do
-    GenServer.start_link(__MODULE__, arg) 
+    GenServer.start_link(__MODULE__, arg)
   end
 
   def init(arg) do

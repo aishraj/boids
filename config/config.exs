@@ -30,5 +30,5 @@ use Mix.Config
 #     import_config "#{Mix.env}.exs"
 
 config :boids,
-  frame_duration: 16000,
+  frame_duration: 1600,
   number_boids: 10

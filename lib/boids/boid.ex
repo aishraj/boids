@@ -25,12 +25,12 @@ defmodule Boids.Boid do
     {:noreply, next_position}
   end
 
-  defp render_position(position) do
-   Buffer.add_position(self(), position)
+  defp render_position({position, index}) do
+   Buffer.add_position(index, position)
   end
 
-  defp calculate_next_position(state) do
-    Enum.random(state-50..state+50)
+  defp calculate_next_position({position_x, index}) do
+    {Enum.random(position_x-50..position_x+50), index}
   end
 
   defp move_after(time_delay_ms) do

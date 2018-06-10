@@ -25,12 +25,13 @@ defmodule Boids.Boid do
     {:noreply, next_position}
   end
 
-  defp render_position({position, index}) do
-   Buffer.add_position(index, position)
+  defp render_position({{position_x, position_y}, index}) do
+   Buffer.add_position(index, [position_x, position_y])
   end
 
-  defp calculate_next_position({position_x, index}) do
-    {Enum.random(position_x-50..position_x+50), index}
+  defp calculate_next_position({{position_x, position_y}, index}) do
+    next_x = Enum.random(position_x..position_x+5) |> rem(50) #TODO: Use a max grid size
+    {{next_x, position_y}, index} #the boids move only on x-axis for now
   end
 
   defp move_after(time_delay_ms) do

@@ -4,6 +4,7 @@ defmodule Boids.Boid do
   require Logger
 
   @frame_duration Application.get_env(:boids, :frame_duration)
+  @max_grid_size Application.get_env(:boids, :max_grid_size)
 
   #API
   def start_link(arg) do
@@ -30,7 +31,7 @@ defmodule Boids.Boid do
   end
 
   defp calculate_next_position({{position_x, position_y}, index}) do
-    next_x = Enum.random(position_x..position_x+5) |> rem(50) #TODO: Use a max grid size
+    next_x = Enum.random(position_x..position_x+5) |> rem(@max_grid_size)
     {{next_x, position_y}, index} #the boids move only on x-axis for now
   end
 

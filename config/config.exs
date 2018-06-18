@@ -3,6 +3,6 @@
 use Mix.Config
 
 config :boids,
-  frame_duration: 1600,
+  frame_duration: 300,
   number_boids: 10,
   max_grid_size: 600

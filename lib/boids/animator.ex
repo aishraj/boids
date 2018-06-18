@@ -2,7 +2,7 @@ defmodule Boids.Animator do
   use GenServer
   require Logger
   require Poison
-  alias Boids.Buffer
+  alias Boids.{Buffer, Boid}
 
   #API
   def start_link(arg) do
@@ -30,14 +30,13 @@ defmodule Boids.Animator do
   defp create_birds(n) do
     (1..n)
     |> Enum.shuffle
-    |> Enum.with_index
-    |> Enum.each(fn {position, index} ->
-      new_bird({:rand.uniform(position), :rand.uniform(position)}, index)
+    |> Enum.each(fn index ->
+      new_bird(Boids.Boid.new(), index)
     end)
   end
 
-  defp new_bird({pos_x, pos_y}, index) do
-    spec = %{id: Boid, start: {Boids.Boid, :start_link, [{{pos_x, pos_y}, index}]}}
+  defp new_bird(boid, index) do
+    spec = %{id: Boid, start: {Boids.Boid, :start_link, [{boid, index}]}}
     DynamicSupervisor.start_child(Boids.DynamicSupervisor, spec)
   end
 

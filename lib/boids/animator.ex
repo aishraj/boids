@@ -2,7 +2,7 @@ defmodule Boids.Animator do
   use GenServer
   require Logger
   require Poison
-  alias Boids.{Buffer, Boid, Physics.Vector}
+  alias Boids.{Buffer, Physics.Vector}
 
   @max_grid_size Application.get_env(:boids, :max_grid_size)
 
@@ -43,7 +43,7 @@ defmodule Boids.Animator do
   end
 
   defp new_bird(boid, index) do
-    spec = %{id: Boid, start: {Boids.Boid, :start_link, [{boid, index}]}}
+    spec = %{id: :"boid_#{index}", name: :"boid_#{index}", start: {Boids.Boid, :start_link, [{boid, index}]}}
     DynamicSupervisor.start_child(Boids.DynamicSupervisor, spec)
   end
 

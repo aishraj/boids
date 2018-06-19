@@ -10,8 +10,7 @@ defmodule Boids.SimpleSupervisor do
   def init(_arg) do
     children = [
       Boids.Animator,
-      Boids.Buffer,
-      Boids.Heatmap
+      Boids.Buffer
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end

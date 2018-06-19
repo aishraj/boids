@@ -20,7 +20,7 @@ defmodule Boids.Boid do
   end
 
   def init(arg) do
-    Logger.info("Init called with arg #{inspect arg}")
+    Logger.debug("Init called with arg #{inspect arg}")
     render_position(arg)
     move_after(@frame_duration)
     {:ok, arg}
@@ -32,6 +32,10 @@ defmodule Boids.Boid do
     render_position(next_position)
     move_after(@frame_duration)
     {:noreply, next_position}
+  end
+
+  def handle_call(:whereareyou, _from, state) do
+    {:reply, state} #pretty much responds with the state
   end
 
   #Private
@@ -50,7 +54,7 @@ defmodule Boids.Boid do
   end
 
   defp calculate_next_position({%Boids.Boid{} = boid, index}) do
-    others = [] #TODO: Change this
+    others = [boid] #TODO: Change this. This should message all boids 1..num_boids and ask for their state. Currently sending processes message by their names is failing.
     sep = separate(boid, others)
     aln = align(boid, others)
     coh = coh(boid, others)
@@ -60,7 +64,6 @@ defmodule Boids.Boid do
           |> applyforce(aln)
           |> applyforce(coh)
           |> move
-    Logger.info("Old #{inspect boid} New #{inspect rboid}")
     {rboid, index}
   end
 
@@ -145,9 +148,9 @@ defmodule Boids.Boid do
   end
 
   defp move(%Boids.Boid{} = boid) do
-    Logger.info("The boid is now #{inspect boid}")
+    Logger.debug("The boid is now #{inspect boid}")
     future_velocity = Vector.add(boid.velocity, boid.accleration)
-    Logger.info("Future velocity is #{inspect future_velocity}")
+    Logger.debug("Future velocity is #{inspect future_velocity}")
     %Boids.Boid{
       velocity: Vector.add(boid.velocity, boid.accleration),
       position: Vector.add(boid.position, boid.velocity),

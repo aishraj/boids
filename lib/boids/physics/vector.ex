@@ -1,5 +1,4 @@
 defmodule Boids.Physics.Vector do
-  require Logger
   defstruct x: nil, y: nil
 
   @max_grid_size Application.get_env(:boids, :max_grid_size)

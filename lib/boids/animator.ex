@@ -2,13 +2,16 @@ defmodule Boids.Animator do
   use GenServer
   require Logger
   require Poison
-  alias Boids.{Buffer, Boid}
+  alias Boids.{Buffer, Boid, Physics.Vector}
+
+  @max_grid_size Application.get_env(:boids, :max_grid_size)
 
   #API
   def start_link(arg) do
     GenServer.start_link(__MODULE__, arg)
   end
 
+  #callbacks
   def init(arg) do
     Process.send(self(), :initialize_simulation, arg)
     {:ok, []}
@@ -27,11 +30,15 @@ defmodule Boids.Animator do
   end
 
 
+  #private
   defp create_birds(n) do
     (1..n)
     |> Enum.shuffle
     |> Enum.each(fn index ->
-      new_bird(Boids.Boid.new(), index)
+      new_bird(%Boids.Boid{
+        position: Vector.new(:rand.uniform(@max_grid_size), :rand.uniform(@max_grid_size)),
+        velocity: Vector.random(),
+        accleration: Vector.new()}, index)
     end)
   end
 

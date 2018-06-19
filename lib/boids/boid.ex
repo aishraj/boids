@@ -13,8 +13,6 @@ defmodule Boids.Boid do
     accleration: Vector.new()
   )
 
-  def new(), do: %Boids.Boid{}
-
 
   #API
   def start_link(arg) do
@@ -29,7 +27,7 @@ defmodule Boids.Boid do
   end
 
   def handle_info(:try_move, state) do
-    Logger.info("Move called with state: #{inspect state}")
+    Logger.debug("Move called with state: #{inspect state}")
     next_position = calculate_next_position(state)
     render_position(next_position)
     move_after(@frame_duration)
@@ -44,9 +42,11 @@ defmodule Boids.Boid do
   end
 
   defp applyforce(boid, force) do 
-  %Boids.Boid{position: boid.position,
-   velocity: boid.velocity,
-   accleration: Vector.add(boid.accleration, force)}
+  %Boids.Boid{
+    position: boid.position,
+    velocity: boid.velocity,
+    accleration: Vector.add(boid.accleration, force)
+   }
   end
 
   defp calculate_next_position({%Boids.Boid{} = boid, index}) do
@@ -54,12 +54,14 @@ defmodule Boids.Boid do
     sep = separate(boid, others)
     aln = align(boid, others)
     coh = coh(boid, others)
-    Logger.info("Sep Align and Cohesion vectors are #{inspect sep} #{inspect aln} and #{inspect coh}")
-    boid = boid
+    Logger.debug("Sep Align and Cohesion vectors are #{inspect sep} #{inspect aln} and #{inspect coh}")
+    rboid = boid
           |> applyforce(sep)
           |> applyforce(aln)
           |> applyforce(coh)
-    {boid, index} #the boids move only on x-axis for now
+          |> move
+    Logger.info("Old #{inspect boid} New #{inspect rboid}")
+    {rboid, index}
   end
 
   defp separate(%Boids.Boid{} = boid, others) do
@@ -75,12 +77,12 @@ defmodule Boids.Boid do
               |> Vector.vec_div(Vector.distance(boid.position, neighbour.position))
       end)
       |> Enum.reduce({Vector.new(0,0), 0}, fn(diff, {s, c}) -> {Vector.add(s, diff), c + 1} end)
-    Logger.info("Steer and count are #{inspect steer_vec} and #{inspect count}")
+    Logger.debug("Steer and count are #{inspect steer_vec} and #{inspect count}")
     steer = case count do
       0 -> steer_vec
       _ -> Vector.vec_div(steer_vec, count)
     end
-    Logger.info("Steer is now #{inspect steer}")
+    Logger.debug("Steer is now #{inspect steer}")
     case Vector.magnitude(steer) do
       0 -> steer
       _ -> steer
@@ -92,23 +94,22 @@ defmodule Boids.Boid do
 
   defp align(%Boids.Boid{} = boid, others) do
     neighbour_dist = 50
-    {vec, count} = others
-    |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) -> 
-    d = Vector.distance(boid.position, neighbour.position) 
-      if (d > 0 && d < neighbour_dist) do
-          {Vector.add(s, neighbour.velocity), c + 1}
-      else
-        {s, c}
-      end
-    end)
-    if count > 0 do
-      vec
-      |> Vector.vec_div(count)
-      |> Vector.normalize()
-      |> Vector.mult(@max_speed)
-      |> Vector.diff(boid.velocity)
-    else
-      Vector.new()
+    {vec, count} = others 
+      |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) -> 
+        d = Vector.distance(boid.position, neighbour.position) 
+          if (d > 0 && d < neighbour_dist) do
+              {Vector.add(s, neighbour.velocity), c + 1}
+          else
+            {s, c}
+          end
+        end)
+    case count do
+      0 -> Vector.new()
+      _ -> vec
+          |> Vector.vec_div(count)
+          |> Vector.normalize()
+          |> Vector.mult(@max_speed)
+          |> Vector.diff(boid.velocity)
     end
   end
 
@@ -123,12 +124,11 @@ defmodule Boids.Boid do
         {s, c}
       end
     end)
-    if count > 0 do
-      vec
-      |> Vector.vec_div(count)
-      |> seek(boid)
-    else
-      Vector.new()
+    case count do
+      0 -> Vector.new()
+      _ -> vec
+          |> Vector.vec_div(count)
+          |> seek(boid)
     end
   end
 
@@ -142,5 +142,16 @@ defmodule Boids.Boid do
 
   defp move_after(time_delay_ms) do
     Process.send_after(self(), :try_move, time_delay_ms)
+  end
+
+  defp move(%Boids.Boid{} = boid) do
+    Logger.info("The boid is now #{inspect boid}")
+    future_velocity = Vector.add(boid.velocity, boid.accleration)
+    Logger.info("Future velocity is #{inspect future_velocity}")
+    %Boids.Boid{
+      velocity: Vector.add(boid.velocity, boid.accleration),
+      position: Vector.add(boid.position, boid.velocity),
+      accleration: Vector.new() #reset to 0
+    }
   end
 end

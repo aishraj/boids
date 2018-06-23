@@ -18,29 +18,27 @@ defmodule Boids.Renderer.Tui do
   end
 
   def handle_info({:render_grid, new_state}, state) do
-
     if new_state != state, do: print_grid(new_state)
 
     {:noreply, new_state}
   end
 
-
   #
   # Other functions
   #
   defp clear_screen do
-    IO.write [IO.ANSI.clear, IO.ANSI.home]
-    IO.write [?\r, ?\n]
+    IO.write([IO.ANSI.clear(), IO.ANSI.home()])
+    IO.write([?\r, ?\n])
   end
 
   defp print_grid(state) do
     clear_screen()
-    IO.write format_grid(state)
+    IO.write(format_grid(state))
   end
 
-
   defp format_grid(grid) do
-    Enum.chunk(grid, 50) #TODO: Read size from config
+    # TODO: Read size from config
+    Enum.chunk(grid, 50)
     |> format_rows
   end
 
@@ -63,5 +61,4 @@ defmodule Boids.Renderer.Tui do
       _ -> [" ", cell]
     end
   end
-
 end

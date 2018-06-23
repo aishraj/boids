@@ -3,9 +3,11 @@
 use Mix.Config
 
 config :boids,
-  frame_duration: 5000, #duration between two frames in ms
+  # duration between two frames in ms
+  frame_duration: 5000,
   number_boids: 25,
-  max_grid_size: 10000 #max x,y grid size of the boids world
+  # max x,y grid size of the boids world
+  max_grid_size: 10000
 
 config :logger,
   level: :debug

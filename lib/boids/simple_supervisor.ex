@@ -12,6 +12,7 @@ defmodule Boids.SimpleSupervisor do
       Boids.Buffer,
       Boids.Animator
     ]
+
     Supervisor.init(children, strategy: :one_for_one)
   end
 end

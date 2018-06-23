@@ -13,7 +13,7 @@ defmodule Boids.Physics.Vector do
     do: %Boids.Physics.Vector{x: v1.x + v2.x, y: v1.y + v2.y}
 
   def vec_div(%Boids.Physics.Vector{} = vector, n),
-    do: %Boids.Physics.Vector{x: (vector.x/n), y: (vector.y/n)}
+    do: %Boids.Physics.Vector{x: vector.x / n, y: vector.y / n}
 
   def mult(%Boids.Physics.Vector{} = vector, n),
     do: %Boids.Physics.Vector{x: vector.x * n, y: vector.y * n}

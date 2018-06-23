@@ -45,7 +45,7 @@ defmodule Boids.Motion do
       end)
       |> Enum.reduce({Vector.new(0, 0), 0}, fn diff, {s, c} -> {Vector.add(s, diff), c + 1} end)
 
-    Logger.info("Steer and count are #{inspect(steer_vec)} and #{inspect(count)}")
+    Logger.debug("Steer and count are #{inspect(steer_vec)} and #{inspect(count)}")
 
     steer =
       case count do

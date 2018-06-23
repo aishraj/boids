@@ -21,7 +21,8 @@ defmodule Boids.Mixfile do
 
   defp deps do
     [
-      {:poison, "~> 3.1"}
+      {:poison, "~> 3.1"},
+      {:wobserver, "~> 0.1"}
     ]
   end
 end

@@ -32,12 +32,10 @@ defmodule Boids.BoidsSupervisor do
   end
 
   defp new_boid_spec(boid, index) do
-     %{
+    %{
       id: :"boid_#{index}",
       name: :"boid_#{index}",
       start: {Boids.Boid, :start_link, [{boid, index}]}
     }
   end
-
-
 end

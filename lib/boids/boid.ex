@@ -46,7 +46,7 @@ defmodule Boids.Boid do
       |> Enum.map(fn {_, v} -> v end)
 
     Logger.debug("Size of others after calculating is #{length(others)}")
-     {Motion.move_boid(boid, others), index}
+    {Motion.move_boid(boid, others), index}
   end
 
   defp move_after(time_delay_ms) do
@@ -54,5 +54,4 @@ defmodule Boids.Boid do
   end
 
   defp generate_name(index), do: :"boid_#{index}"
-
 end

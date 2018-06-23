@@ -22,10 +22,10 @@ defmodule Boids.Motion do
     )
 
     boid
-      |> applyforce(sep)
-      |> applyforce(aln)
-      |> applyforce(coh)
-      |> move
+    |> applyforce(sep)
+    |> applyforce(aln)
+    |> applyforce(coh)
+    |> move
   end
 
   def separate(%Boids.Boid{} = boid, others) do
@@ -142,5 +142,4 @@ defmodule Boids.Motion do
       accleration: Vector.new()
     }
   end
-
 end

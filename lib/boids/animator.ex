@@ -26,7 +26,7 @@ defmodule Boids.Animator do
   end
 
   # private
-   defp render_json(time_delay_ms) do
+  defp render_json(time_delay_ms) do
     Buffer.get_all_boid_states() |> Poison.encode!() |> IO.puts()
     Process.send_after(self(), :render_json, time_delay_ms)
   end

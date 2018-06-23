@@ -46,22 +46,7 @@ defmodule Boids.Boid do
       |> Enum.map(fn {_, v} -> v end)
 
     Logger.debug("Size of others after calculating is #{length(others)}")
-    sep = Motion.separate(boid, others)
-    aln = Motion.align(boid, others)
-    coh = Motion.coh(boid, others)
-
-    Logger.info(
-      "Sep Align and Cohesion vectors are #{inspect(sep)} #{inspect(aln)} and #{inspect(coh)}"
-    )
-
-    rboid =
-      boid
-      |> Motion.applyforce(sep)
-      |> Motion.applyforce(aln)
-      |> Motion.applyforce(coh)
-      |> move
-
-    {rboid, index}
+     {Motion.move_boid(boid, others), index}
   end
 
   defp move_after(time_delay_ms) do
@@ -70,15 +55,4 @@ defmodule Boids.Boid do
 
   defp generate_name(index), do: :"boid_#{index}"
 
-  defp move(%Boids.Boid{} = boid) do
-    future_velocity = Vector.add(boid.velocity, boid.accleration)
-    Logger.debug("Future velocity is #{inspect(future_velocity)}")
-
-    %Boids.Boid{
-      velocity: Vector.add(boid.velocity, boid.accleration),
-      position: Vector.add(boid.position, boid.velocity),
-      # reset to 0
-      accleration: Vector.new()
-    }
-  end
 end

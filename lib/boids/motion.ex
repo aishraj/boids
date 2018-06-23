@@ -12,6 +12,22 @@ defmodule Boids.Motion do
     }
   end
 
+  def move_boid(boid, others) do
+    sep = separate(boid, others)
+    aln = align(boid, others)
+    coh = coh(boid, others)
+
+    Logger.debug(
+      "Sep Align and Cohesion vectors are #{inspect(sep)} #{inspect(aln)} and #{inspect(coh)}"
+    )
+
+    boid
+      |> applyforce(sep)
+      |> applyforce(aln)
+      |> applyforce(coh)
+      |> move
+  end
+
   def separate(%Boids.Boid{} = boid, others) do
     # Logger.info("Size of boids in separate is #{length(others)}")
     min_space = 10
@@ -65,7 +81,7 @@ defmodule Boids.Motion do
         end
       end)
 
-    Logger.info("Align prevec and count are #{inspect({vec, count})}")
+    Logger.debug("Align prevec and count are #{inspect({vec, count})}")
 
     case count do
       0 ->
@@ -114,4 +130,17 @@ defmodule Boids.Motion do
     |> Vector.mult(@max_speed)
     |> Vector.diff(boid.velocity)
   end
+
+  defp move(%Boids.Boid{} = boid) do
+    future_velocity = Vector.add(boid.velocity, boid.accleration)
+    Logger.debug("Future velocity is #{inspect(future_velocity)}")
+
+    %Boids.Boid{
+      velocity: Vector.add(boid.velocity, boid.accleration),
+      position: Vector.add(boid.position, boid.velocity),
+      # reset to 0
+      accleration: Vector.new()
+    }
+  end
+
 end

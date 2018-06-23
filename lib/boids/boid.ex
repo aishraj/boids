@@ -15,37 +15,34 @@ defmodule Boids.Boid do
 
 
   #API
-  def start_link(arg) do
-    GenServer.start_link(__MODULE__, arg)
+  def start_link({state, index}) do
+    GenServer.start_link(__MODULE__, {state, index}, name: generate_name(index))
   end
 
-  def init(arg) do
-    Logger.debug("Init called with arg #{inspect arg}")
-    render_position(arg)
+  @impl true
+  def init({state, index}) do
+    Logger.debug("Init called with arg #{inspect {state, index}}")
+    render_position({state,generate_name(index)})
     move_after(@frame_duration)
-    {:ok, arg}
+    {:ok, {state,index}}
   end
 
+  @impl true
   def handle_info(:try_move, state) do
     Logger.debug("Move called with state: #{inspect state}")
-    next_position = calculate_next_position(state)
-    render_position(next_position)
+    {new_state, index} = calculate_next_position(state)
+    render_position({new_state, generate_name(index)})
     move_after(@frame_duration)
-    {:noreply, next_position}
+    {:noreply, {new_state, index}}
   end
 
-  def handle_call(:whereareyou, _from, state) do
-    {:reply, state} #pretty much responds with the state
-  end
 
   #Private
-  defp render_position({%Boids.Boid{}= boid, index}) do
-    position_x = boid.position.x
-    position_y = boid.position.y
-   Buffer.add_position(index, [position_x, position_y])
+  defp render_position({%Boids.Boid{}= boid, boid_name}) do
+   Buffer.add_boid_state(boid_name, boid)
   end
 
-  defp applyforce(boid, force) do 
+  defp applyforce(boid, force) do
   %Boids.Boid{
     position: boid.position,
     velocity: boid.velocity,
@@ -54,7 +51,11 @@ defmodule Boids.Boid do
   end
 
   defp calculate_next_position({%Boids.Boid{} = boid, index}) do
-    others = [boid] #TODO: Change this. This should message all boids 1..num_boids and ask for their state. Currently sending processes message by their names is failing.
+
+    others = Buffer.get_all_boid_states
+            |> Enum.map(fn {_,v} -> v end)
+
+    Logger.debug("Size of others after calculating is #{length(others)}")
     sep = separate(boid, others)
     aln = align(boid, others)
     coh = coh(boid, others)
@@ -68,14 +69,15 @@ defmodule Boids.Boid do
   end
 
   defp separate(%Boids.Boid{} = boid, others) do
+    #Logger.info("Size of boids in separate is #{length(others)}")
     min_space = 25
     {steer_vec, count} = others
-      |> Enum.filter(fn neighbour -> 
+      |> Enum.filter(fn neighbour ->
         distance = Vector.distance(boid.position, neighbour.position)
         distance > 0 &&  distance < min_space
       end)
-      |> Enum.map(fn neighbour -> 
-        Vector.diff(boid.position, neighbour.position) 
+      |> Enum.map(fn neighbour ->
+        Vector.diff(boid.position, neighbour.position)
               |> Vector.normalize
               |> Vector.vec_div(Vector.distance(boid.position, neighbour.position))
       end)
@@ -96,10 +98,11 @@ defmodule Boids.Boid do
   end
 
   defp align(%Boids.Boid{} = boid, others) do
+    #Logger.info("Size of boids in align is #{length(others)}")
     neighbour_dist = 50
-    {vec, count} = others 
-      |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) -> 
-        d = Vector.distance(boid.position, neighbour.position) 
+    {vec, count} = others
+      |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) ->
+        d = Vector.distance(boid.position, neighbour.position)
           if (d > 0 && d < neighbour_dist) do
               {Vector.add(s, neighbour.velocity), c + 1}
           else
@@ -117,9 +120,10 @@ defmodule Boids.Boid do
   end
 
   defp coh(%Boids.Boid{} = boid, others) do
+    #Logger.info("Size of boids in coh is #{length(others)}")
     neighbour_dist = 5
     {vec, count} = others
-    |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) -> 
+    |> Enum.reduce({Vector.new(), 0}, fn(neighbour, {s, c}) ->
       d = Vector.distance(boid.position, neighbour.position)
       if (d > 0 && d < neighbour_dist) do
           {Vector.add(s, neighbour.velocity), c + 1}
@@ -146,6 +150,8 @@ defmodule Boids.Boid do
   defp move_after(time_delay_ms) do
     Process.send_after(self(), :try_move, time_delay_ms)
   end
+
+  defp generate_name(index), do: :"boid_#{index}"
 
   defp move(%Boids.Boid{} = boid) do
     Logger.debug("The boid is now #{inspect boid}")

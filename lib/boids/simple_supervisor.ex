@@ -9,8 +9,8 @@ defmodule Boids.SimpleSupervisor do
   @impl true
   def init(_arg) do
     children = [
-      Boids.Animator,
-      Boids.Buffer
+      Boids.Buffer,
+      Boids.Animator
     ]
     Supervisor.init(children, strategy: :one_for_one)
   end

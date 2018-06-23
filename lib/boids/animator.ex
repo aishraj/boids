@@ -18,7 +18,6 @@ defmodule Boids.Animator do
   end
 
   def handle_info(:initialize_simulation, _state) do
-    Logger.info("Starting birds now......")
     create_birds(Application.get_env(:boids, :number_boids))
     render_json(Application.get_env(:boids, :frame_duration))
     {:noreply, []}
@@ -48,9 +47,7 @@ defmodule Boids.Animator do
   end
 
   defp render_json(time_delay_ms) do
-    #Hack: For now just using IO.puts to "render the item on screen as json"
-    #TODO: Emit this to a websocket or to a TUI process
-    Buffer.get_all_positions |> Poison.encode! |> IO.puts
+    Buffer.get_all_boid_states |> Poison.encode! |> IO.puts
     Process.send_after(self(), :render_json, time_delay_ms)
   end
 

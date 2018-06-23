@@ -5,6 +5,7 @@ defmodule Boids.Animator do
   alias Boids.{Buffer, Physics.Vector}
 
   @max_grid_size Application.get_env(:boids, :max_grid_size)
+  @max_velocity Application.get_env(:boids, :max_velocity)
 
   # API
   def start_link(arg) do
@@ -36,7 +37,7 @@ defmodule Boids.Animator do
       new_bird(
         %Boids.Boid{
           position: Vector.new(:rand.uniform(@max_grid_size), :rand.uniform(@max_grid_size)),
-          velocity: Vector.random(),
+          velocity: Vector.new(:rand.uniform(@max_velocity), :rand.uniform(@max_velocity)),
           accleration: Vector.new()
         },
         index

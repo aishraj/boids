@@ -4,10 +4,11 @@ use Mix.Config
 
 config :boids,
   # duration between two frames in ms
-  frame_duration: 5000,
+  frame_duration: 1000,
   number_boids: 25,
   # max x,y grid size of the boids world
-  max_grid_size: 10000
+  max_grid_size: 10_000,
+  max_velocity: 20
 
 config :logger,
-  level: :debug
+  level: :info

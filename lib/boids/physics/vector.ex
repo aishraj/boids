@@ -13,7 +13,7 @@ defmodule Boids.Physics.Vector do
     do: %Boids.Physics.Vector{x: v1.x + v2.x, y: v1.y + v2.y}
 
   def vec_div(%Boids.Physics.Vector{} = vector, n),
-    do: %Boids.Physics.Vector{x: div(vector.x, n), y: div(vector.y, n)}
+    do: %Boids.Physics.Vector{x: (vector.x/n), y: (vector.y/n)}
 
   def mult(%Boids.Physics.Vector{} = vector, n),
     do: %Boids.Physics.Vector{x: vector.x * n, y: vector.y * n}
@@ -41,6 +41,6 @@ defmodule Boids.Physics.Vector do
   def normalize(%Boids.Physics.Vector{} = vector), do: normalize(vector, magnitude(vector))
   def normalize(%Boids.Physics.Vector{} = vector, 0), do: vector
   def normalize(%Boids.Physics.Vector{} = vector, 0.0), do: vector
-  def normalize(%Boids.Physics.Vector{} = vector, 1), do: vector
+  def normalize(%Boids.Physics.Vector{} = vector, 1.0), do: vector
   def normalize(%Boids.Physics.Vector{} = vector, mag), do: vec_div(vector, mag)
 end

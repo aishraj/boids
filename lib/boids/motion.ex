@@ -12,7 +12,6 @@ defmodule Boids.Motion do
     }
   end
 
-
   def separate(%Boids.Boid{} = boid, others) do
     # Logger.info("Size of boids in separate is #{length(others)}")
     min_space = 10
@@ -64,9 +63,9 @@ defmodule Boids.Motion do
         else
           {s, c}
         end
-    end)
+      end)
 
-      Logger.info("Align prevec and count are #{inspect {vec,count}}")
+    Logger.info("Align prevec and count are #{inspect({vec, count})}")
 
     case count do
       0 ->
@@ -115,5 +114,4 @@ defmodule Boids.Motion do
     |> Vector.mult(@max_speed)
     |> Vector.diff(boid.velocity)
   end
-
 end

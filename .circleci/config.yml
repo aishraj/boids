@@ -1,0 +1,13 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/boids
+    docker:
+      - image: circleci/elixir:1.5
+        environment:
+          MIX_ENV test
+    steps:
+      - checkout
+      - run local.hex --force
+      - run local.rebar --force
+      - run mix test

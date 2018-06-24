@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: circleci/elixir:1.5
         environment:
-          MIX_ENV test
+          MIX_ENV=test
     steps:
       - checkout
       - run local.hex --force
